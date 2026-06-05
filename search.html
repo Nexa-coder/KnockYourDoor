@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search – KnockYourDoor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .search-page { max-width: 1200px; margin: 2.5rem auto; padding: 0 2.5rem; }
+    .search-header { margin-bottom: 2rem; }
+    .search-query-bar { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .search-query-bar input { flex: 1; padding: 0.85rem 1.25rem; border: 1.5px solid var(--border); border-radius: 50px; font-family: var(--body); font-size: 15px; outline: none; }
+    .search-query-bar input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-glow); }
+    .search-query-bar button { padding: 0.85rem 2rem; background: var(--blue); color: white; border: none; border-radius: 50px; font-family: var(--body); font-weight: 700; font-size: 14px; cursor: pointer; }
+    .search-query-bar button:hover { background: var(--blue-dark); }
+    .result-count { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; }
+    .result-count strong { color: var(--text); }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1.5rem; }
+    .no-results { text-align: center; padding: 4rem 2rem; }
+    .no-results .no-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .no-results h3 { font-family: var(--display); font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .no-results p { color: var(--muted); margin-bottom: 1.5rem; }
+    .suggestions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1rem; }
+    .suggestion-chip { padding: 0.4rem 1rem; background: var(--bg); border: 1.5px solid var(--border); border-radius: 50px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .suggestion-chip:hover { border-color: var(--blue); color: var(--blue); }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="home.html" class="nav-logo"><div class="logo-dot"></div>Knock<span>YourDoor</span></a>
+  <div class="nav-search">
+    <input type="text" placeholder="Search products..." id="search-input"/>
+    <button onclick="doSearch()">Search</button>
+  </div>
+  <div class="nav-actions">
+    <a href="home.html" class="nav-link">Home</a>
+    <a href="orders.html" class="nav-link">Orders</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count" style="display:none">0</span></a>
+  </div>
+  <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-search">
+    <input type="text" id="mobile-search-input" placeholder="Search products..."/>
+    <button onclick="doMobileSearch()">Search</button>
+  </div>
+      <a href="home.html" class="mobile-nav-link active"><span class="m-icon">🏠</span> Home</a>
+      <a href="orders.html" class="mobile-nav-link "><span class="m-icon">📋</span> Orders</a>
+      <a href="profile.html" class="mobile-nav-link "><span class="m-icon">👤</span> Profile</a>
+      <a href="cart.html" class="mobile-nav-link mobile-cart-link"><span class="m-icon">🛒</span> Cart</a>
+</div>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const btn = document.getElementById('hamburger-btn');
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  function doMobileSearch() {
+    const q = document.getElementById('mobile-search-input').value.trim();
+    if (q) window.location.href = 'search.html?q=' + encodeURIComponent(q);
+  }
+  document.getElementById('mobile-search-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doMobileSearch();
+  });
+</script>
+
+<div class="search-page">
+  <div class="search-header">
+    <div class="search-query-bar">
+      <input type="text" id="main-search-input" placeholder="Search for clothes, shoes, electronics..."/>
+      <button onclick="runSearch()">Search</button>
+    </div>
+  </div>
+  <div id="result-count" class="result-count"></div>
+  <div id="results-grid"></div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Knock<span>YourDoor</span></div>
+    <p>© 2026 <span>KnockYourDoor</span> — Built by Aman Kumar</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script>
+  if (!getUser()) window.location.href = 'index.html';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  let query = urlParams.get('q') || '';
+
+  document.getElementById('main-search-input').value = query;
+  document.getElementById('search-input').value = query;
+
+  function runSearch() {
+    const q = document.getElementById('main-search-input').value.trim();
+    if (q) {
+      history.replaceState(null, '', `search.html?q=${encodeURIComponent(q)}`);
+      query = q;
+      document.getElementById('search-input').value = q;
+      performSearch(q);
+    }
+  }
+
+  document.getElementById('main-search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') runSearch();
+  });
+
+  function performSearch(q) {
+    const lower = q.toLowerCase().trim();
+    const keywords = lower.split(/\s+/);
+
+    const results = KYD_PRODUCTS.filter(p => {
+      const searchString = [p.name, p.brand, p.cat].join(' ').toLowerCase();
+      return keywords.every(kw => searchString.includes(kw)) ||
+             keywords.some(kw => searchString.includes(kw));
+    });
+
+    // Sort: exact matches first
+    results.sort((a, b) => {
+      const aStr = (a.name + ' ' + a.brand).toLowerCase();
+      const bStr = (b.name + ' ' + b.brand).toLowerCase();
+      const aExact = keywords.filter(k => aStr.includes(k)).length;
+      const bExact = keywords.filter(k => bStr.includes(k)).length;
+      return bExact - aExact;
+    });
+
+    const countEl = document.getElementById('result-count');
+    const gridEl = document.getElementById('results-grid');
+
+    if (!results.length) {
+      countEl.innerHTML = '';
+      gridEl.innerHTML = `
+        <div class="no-results">
+          <div class="no-icon">🔍</div>
+          <h3>No results for "${q}"</h3>
+          <p>Try a different keyword or browse a category</p>
+          <div class="suggestions">
+            ${['T-Shirt','Jeans','Shoes','Earbuds','Cap','Bag','Kurti','Sneakers','Watch','Socks'].map(s =>
+              `<span class="suggestion-chip" onclick="document.getElementById('main-search-input').value='${s}';runSearch()">${s}</span>`
+            ).join('')}
+          </div>
+          <a href="home.html" class="btn btn-primary" style="margin-top:1.5rem;display:inline-block">← Back to Home</a>
+        </div>`;
+      return;
+    }
+
+    countEl.innerHTML = `Showing <strong>${results.length} results</strong> for "<strong>${q}</strong>"`;
+    gridEl.innerHTML = `<div class="products-grid">${results.map(p => productCardHTML(p)).join('')}</div>`;
+  }
+
+  if (query) {
+    performSearch(query);
+  } else {
+    document.getElementById('result-count').innerHTML = 'Enter a search term above to find products';
+    document.getElementById('results-grid').innerHTML = `
+      <div style="text-align:center;padding:3rem 0">
+        <div style="font-size:3rem;margin-bottom:1rem">🛍️</div>
+        <p style="color:var(--muted);margin-bottom:1rem">Popular searches:</p>
+        <div class="suggestions" style="justify-content:center">
+          ${['T-Shirt','Jeans','Running Shoes','Earbuds','Kurti','Backpack','Cap','Watch','Socks','Sneakers'].map(s =>
+            `<span class="suggestion-chip" onclick="document.getElementById('main-search-input').value='${s}';runSearch()">${s}</span>`
+          ).join('')}
+        </div>
+      </div>`;
+  }
+</script>
+</body>
+</html>

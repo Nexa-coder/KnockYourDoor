@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product – KnockYourDoor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .product-detail-page { max-width: 1200px; margin: 2.5rem auto; padding: 0 2.5rem; }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 2rem; flex-wrap: wrap; }
+    .breadcrumb a { color: var(--blue); font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb span { color: var(--muted); }
+
+    /* ── DETAIL LAYOUT ── */
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 4rem; align-items: start; }
+    @media (max-width: 768px) { .detail-grid { grid-template-columns: 1fr; gap: 2rem; } }
+
+    /* ── IMAGE GALLERY ── */
+    .gallery { position: sticky; top: 88px; }
+    .gallery-main { width: 100%; aspect-ratio: 1; border-radius: var(--radius); overflow: hidden; background: var(--bg2); margin-bottom: 1rem; border: 1.5px solid var(--border); }
+    .gallery-main img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+    .gallery-main:hover img { transform: scale(1.05); }
+    .gallery-thumbs { display: flex; gap: 0.75rem; }
+    .gallery-thumb {
+      width: 70px; height: 70px; border-radius: 10px; overflow: hidden;
+      border: 2px solid var(--border); cursor: pointer; transition: all 0.2s;
+      background: var(--bg2); flex-shrink: 0;
+    }
+    .gallery-thumb.active { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-glow); }
+    .gallery-thumb:hover { border-color: var(--blue); }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── PRODUCT INFO ── */
+    .detail-info { }
+    .detail-badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+    .detail-badge { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+    .detail-badge-blue { background: var(--blue); color: white; }
+    .detail-badge-green { background: #D1FAE5; color: var(--success); }
+    .detail-badge-orange { background: #FEF3C7; color: var(--warning); }
+    .detail-brand { font-size: 12px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .detail-name { font-family: var(--display); font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; line-height: 1.2; margin-bottom: 1rem; color: var(--text); }
+    .detail-rating-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .detail-stars { color: #F59E0B; font-size: 1rem; letter-spacing: 2px; }
+    .detail-rating-num { font-weight: 800; font-size: 15px; color: var(--text); }
+    .detail-reviews { font-size: 13px; color: var(--muted); }
+    .detail-divider { border: none; border-top: 1.5px solid var(--border); margin: 1.25rem 0; }
+    .detail-price-section { margin-bottom: 1.5rem; }
+    .detail-price { font-family: var(--display); font-size: 2rem; font-weight: 800; color: var(--text); }
+    .detail-price-old { font-size: 1rem; color: var(--muted); text-decoration: line-through; margin-left: 8px; }
+    .detail-discount { display: inline-block; background: #D1FAE5; color: var(--success); padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 800; margin-left: 10px; }
+    .detail-savings { font-size: 13px; color: var(--success); font-weight: 600; margin-top: 6px; }
+    .detail-tax-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* ── SIZE SELECTOR ── */
+    .size-section { margin-bottom: 1.5rem; }
+    .size-label { font-size: 13px; font-weight: 700; color: var(--text2); margin-bottom: 0.75rem; display: flex; justify-content: space-between; }
+    .size-label span { color: var(--blue); cursor: pointer; font-weight: 600; font-size: 12px; }
+    .size-label span:hover { text-decoration: underline; }
+    .sizes-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .size-btn {
+      min-width: 48px; height: 44px; padding: 0 10px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      background: white; font-family: var(--body); font-size: 13px;
+      font-weight: 700; cursor: pointer; transition: all 0.2s; color: var(--text2);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .size-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+    .size-btn.selected { border-color: var(--blue); background: var(--blue); color: white; }
+    .size-btn.out-of-stock { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+
+    /* ── QTY + CTA ── */
+    .qty-section { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .qty-label { font-size: 13px; font-weight: 700; color: var(--text2); }
+    .qty-stepper { display: flex; align-items: center; gap: 0; border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .qty-step-btn { width: 40px; height: 40px; border: none; background: var(--bg); font-size: 18px; cursor: pointer; font-weight: 700; color: var(--text); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+    .qty-step-btn:hover { background: var(--blue); color: white; }
+    .qty-step-num { width: 44px; text-align: center; font-weight: 800; font-size: 15px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); height: 40px; display: flex; align-items: center; justify-content: center; background: white; }
+
+    .cta-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .cta-add-cart { flex: 1; padding: 1rem; background: var(--blue); color: white; border: none; border-radius: 50px; font-family: var(--body); font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px; }
+    .cta-add-cart:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,87,255,0.35); }
+    .cta-wishlist { width: 52px; height: 52px; border: 1.5px solid var(--border); border-radius: 50px; background: white; font-size: 1.3rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+    .cta-wishlist:hover { border-color: #F03D3D; background: #FEE2E2; }
+    .cta-wishlist.wishlisted { border-color: #F03D3D; background: #FEE2E2; }
+
+    /* ── DELIVERY INFO ── */
+    .delivery-info { background: var(--bg); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; }
+    .delivery-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 0.75rem; }
+    .delivery-row:last-child { margin-bottom: 0; }
+    .delivery-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .delivery-text-main { font-size: 13px; font-weight: 700; color: var(--text); }
+    .delivery-text-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── HIGHLIGHTS ── */
+    .highlights { margin-bottom: 1.5rem; }
+    .highlights-title { font-size: 13px; font-weight: 800; color: var(--text2); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .highlights-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .highlights-list li { font-size: 13px; color: var(--text2); display: flex; gap: 8px; }
+    .highlights-list li::before { content: '✓'; color: var(--success); font-weight: 800; flex-shrink: 0; }
+
+    /* ── DESCRIPTION TABS ── */
+    .tabs-section { background: white; border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 4rem; overflow: hidden; }
+    .tabs-nav { display: flex; border-bottom: 1.5px solid var(--border); }
+    .tab-nav-btn { padding: 1rem 1.75rem; font-family: var(--body); font-size: 14px; font-weight: 700; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 2.5px solid transparent; margin-bottom: -1.5px; transition: all 0.2s; }
+    .tab-nav-btn.active { color: var(--blue); border-bottom-color: var(--blue); background: var(--blue-light); }
+    .tab-nav-btn:hover:not(.active) { color: var(--text); background: var(--bg); }
+    .tab-panel { padding: 2rem; display: none; }
+    .tab-panel.active { display: block; }
+    .tab-panel p { font-size: 14px; line-height: 1.8; color: var(--text2); margin-bottom: 1rem; }
+    .spec-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .spec-table tr { border-bottom: 1px solid var(--border); }
+    .spec-table tr:last-child { border: none; }
+    .spec-table td { padding: 0.75rem 1rem; }
+    .spec-table td:first-child { color: var(--muted); font-weight: 700; width: 35%; background: var(--bg); }
+    .spec-table td:last-child { color: var(--text); }
+
+    /* ── REVIEWS ── */
+    .reviews-summary { display: grid; grid-template-columns: 160px 1fr; gap: 2rem; align-items: center; margin-bottom: 2rem; }
+    .reviews-big-num { font-family: var(--display); font-size: 4rem; font-weight: 800; color: var(--text); line-height: 1; }
+    .reviews-big-stars { font-size: 1.5rem; color: #F59E0B; margin: 6px 0; }
+    .reviews-big-count { font-size: 13px; color: var(--muted); }
+    .reviews-bars { flex: 1; }
+    .review-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 12px; color: var(--muted); font-weight: 600; }
+    .review-bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 50px; overflow: hidden; }
+    .review-bar-fill { height: 100%; background: #F59E0B; border-radius: 50px; transition: width 0.5s; }
+    .review-cards { display: flex; flex-direction: column; gap: 1.25rem; }
+    .review-card { background: var(--bg); border-radius: var(--radius-sm); padding: 1.25rem; }
+    .review-card-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; align-items: flex-start; }
+    .review-author { font-weight: 700; font-size: 14px; }
+    .review-date { font-size: 12px; color: var(--muted); }
+    .review-stars { color: #F59E0B; font-size: 13px; margin-bottom: 6px; }
+    .review-text { font-size: 13px; color: var(--text2); line-height: 1.7; }
+    .review-verified { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--success); font-weight: 700; margin-top: 6px; }
+
+    /* ── RELATED PRODUCTS ── */
+    .related-section { margin-bottom: 4rem; }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+
+    /* ── FLOATING ADD TO CART ── */
+    .sticky-cta {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: white; border-top: 1.5px solid var(--border);
+      padding: 1rem 2.5rem; display: none; align-items: center; justify-content: space-between;
+      gap: 1rem; box-shadow: 0 -4px 24px rgba(0,87,255,0.1);
+    }
+    .sticky-cta.visible { display: flex; }
+    .sticky-cta-name { font-weight: 700; font-size: 15px; }
+    .sticky-cta-price { font-family: var(--display); font-size: 1.2rem; font-weight: 800; color: var(--blue); }
+    .sticky-cta-btn { padding: 0.75rem 2rem; background: var(--blue); color: white; border: none; border-radius: 50px; font-family: var(--body); font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .sticky-cta-btn:hover { background: var(--blue-dark); }
+
+    /* ── PRODUCT CARD hover fix ── */
+    .product-card { cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="home.html" class="nav-logo"><div class="logo-dot"></div>Knock<span>YourDoor</span></a>
+  <div class="nav-search">
+    <input type="text" placeholder="Search products..." id="search-input"/>
+    <button onclick="doSearch()">Search</button>
+  </div>
+  <div class="nav-actions">
+    <a href="home.html" class="nav-link">Home</a>
+    <a href="orders.html" class="nav-link">Orders</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count" style="display:none">0</span></a>
+  </div>
+  <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-search">
+    <input type="text" id="mobile-search-input" placeholder="Search products..."/>
+    <button onclick="doMobileSearch()">Search</button>
+  </div>
+      <a href="home.html" class="mobile-nav-link active"><span class="m-icon">🏠</span> Home</a>
+      <a href="orders.html" class="mobile-nav-link "><span class="m-icon">📋</span> Orders</a>
+      <a href="profile.html" class="mobile-nav-link "><span class="m-icon">👤</span> Profile</a>
+      <a href="cart.html" class="mobile-nav-link mobile-cart-link"><span class="m-icon">🛒</span> Cart</a>
+</div>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const btn = document.getElementById('hamburger-btn');
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  function doMobileSearch() {
+    const q = document.getElementById('mobile-search-input').value.trim();
+    if (q) window.location.href = 'search.html?q=' + encodeURIComponent(q);
+  }
+  document.getElementById('mobile-search-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doMobileSearch();
+  });
+</script>
+
+<div class="product-detail-page" id="page-root">
+  <div style="text-align:center;padding:5rem 0;color:var(--muted)">
+    <div style="font-size:2rem;margin-bottom:1rem">🔄</div>
+    <p>Loading product...</p>
+  </div>
+</div>
+
+<!-- Sticky CTA -->
+<div class="sticky-cta" id="sticky-cta">
+  <div>
+    <div class="sticky-cta-name" id="sticky-name">—</div>
+    <div class="sticky-cta-price" id="sticky-price">—</div>
+  </div>
+  <button class="sticky-cta-btn" onclick="ctaAddToCart()">🛒 Add to Cart</button>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Knock<span>YourDoor</span></div>
+    <p>© 2026 <span>KnockYourDoor</span> — Built by Aman Kumar</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script>
+  if (!getUser()) window.location.href = 'index.html';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = parseInt(urlParams.get('id'));
+  const product = KYD_PRODUCTS.find(p => p.id === productId);
+
+  let selectedSize = '';
+  let qty = 1;
+  let isWishlisted = false;
+
+  if (!product) {
+    document.getElementById('page-root').innerHTML = `
+      <div style="text-align:center;padding:5rem 0">
+        <div style="font-size:4rem;margin-bottom:1rem">😕</div>
+        <h2 style="font-family:var(--display);font-weight:800;margin-bottom:0.5rem">Product not found</h2>
+        <p style="color:var(--muted);margin-bottom:2rem">This product doesn't exist or was removed.</p>
+        <a href="home.html" class="btn btn-primary">← Back to Home</a>
+      </div>`;
+  } else {
+    document.title = product.name + ' – KnockYourDoor';
+    renderProduct();
+    setupStickyBar();
+  }
+
+  // ── Generate fake but consistent "other images" for gallery thumbs ──
+  function getGalleryImages(p) {
+    // Use slightly different Unsplash params to simulate multiple angles
+    const base = p.img.split('?')[0];
+    return [
+      p.img,
+      base + '?w=400&q=80&crop=entropy',
+      base + '?w=400&q=80&sat=-20',
+      base + '?w=400&q=80&flip=h',
+    ];
+  }
+
+  function renderProduct() {
+    const p = product;
+    const discount = Math.round((1 - p.price / p.old) * 100);
+    const stars = '★'.repeat(Math.floor(p.rating)) + (p.rating % 1 >= 0.5 ? '½' : '') + '☆'.repeat(5 - Math.ceil(p.rating));
+    const savings = p.old - p.price;
+    const imgs = getGalleryImages(p);
+
+    const sizeHTML = p.sizes && p.sizes.length > 0 ? `
+      <div class="size-section">
+        <div class="size-label">
+          Select Size
+          <span onclick="showToast('Size guide coming soon!', 'default')">📏 Size Guide</span>
+        </div>
+        <div class="sizes-row" id="sizes-row">
+          ${p.sizes.map(s => `<button class="size-btn" onclick="selectSize('${s}', this)">${s}</button>`).join('')}
+        </div>
+      </div>` : '';
+
+    const highlights = generateHighlights(p);
+
+    const root = document.getElementById('page-root');
+    root.innerHTML = `
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="home.html">Home</a> ›
+        <a href="home.html">${catLabel(p.cat)}</a> ›
+        <span>${p.name}</span>
+      </div>
+
+      <!-- Main Detail Grid -->
+      <div class="detail-grid">
+
+        <!-- Left: Image Gallery -->
+        <div class="gallery">
+          <div class="gallery-main" id="gallery-main">
+            <img id="main-img" src="${imgs[0]}" alt="${p.name}" onerror="this.src='${p.img}'"/>
+          </div>
+          <div class="gallery-thumbs">
+            ${imgs.map((img, i) => `
+              <div class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="switchImg('${img}', this)">
+                <img src="${img}" alt="${p.name} view ${i+1}" onerror="this.style.display='none'"/>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Right: Product Info -->
+        <div class="detail-info">
+          <div class="detail-badge-row">
+            ${p.badge ? `<span class="detail-badge detail-badge-blue">${p.badge}</span>` : ''}
+            <span class="detail-badge detail-badge-green">✓ In Stock</span>
+            <span class="detail-badge detail-badge-orange">🔥 ${discount}% OFF</span>
+          </div>
+
+          <div class="detail-brand">${p.brand}</div>
+          <h1 class="detail-name">${p.name}</h1>
+
+          <div class="detail-rating-row">
+            <span class="detail-stars">★★★★${p.rating >= 4.5 ? '★' : '☆'}</span>
+            <span class="detail-rating-num">${p.rating}</span>
+            <span class="detail-reviews">${p.reviews.toLocaleString()} ratings</span>
+            <span style="color:var(--blue);font-size:13px;font-weight:600;cursor:pointer" onclick="switchTab('reviews')">See all reviews →</span>
+          </div>
+
+          <hr class="detail-divider"/>
+
+          <div class="detail-price-section">
+            <div>
+              <span class="detail-price">₹${p.price.toLocaleString()}</span>
+              <span class="detail-price-old">₹${p.old.toLocaleString()}</span>
+              <span class="detail-discount">Save ${discount}%</span>
+            </div>
+            <div class="detail-savings">You save ₹${savings.toLocaleString()} on this order!</div>
+            <div class="detail-tax-note">Inclusive of all taxes · Free delivery on orders above ₹999</div>
+          </div>
+
+          <hr class="detail-divider"/>
+
+          ${sizeHTML}
+
+          <div class="qty-section">
+            <span class="qty-label">Qty:</span>
+            <div class="qty-stepper">
+              <button class="qty-step-btn" onclick="changeQty(-1)">−</button>
+              <div class="qty-step-num" id="qty-display">1</div>
+              <button class="qty-step-btn" onclick="changeQty(1)">+</button>
+            </div>
+          </div>
+
+          <div class="cta-row">
+            <button class="cta-add-cart" onclick="ctaAddToCart()">🛒 Add to Cart</button>
+            <button class="cta-wishlist" id="wishlist-btn" onclick="toggleWishlist()" title="Add to Wishlist">🤍</button>
+          </div>
+
+          <!-- Delivery Info -->
+          <div class="delivery-info">
+            <div class="delivery-row">
+              <span class="delivery-icon">🚀</span>
+              <div>
+                <div class="delivery-text-main">Free Delivery</div>
+                <div class="delivery-text-sub">On orders above ₹999 · Estimated 2–4 business days</div>
+              </div>
+            </div>
+            <div class="delivery-row">
+              <span class="delivery-icon">🔄</span>
+              <div>
+                <div class="delivery-text-main">Easy 7-Day Returns</div>
+                <div class="delivery-text-sub">No questions asked return policy</div>
+              </div>
+            </div>
+            <div class="delivery-row">
+              <span class="delivery-icon">🛡️</span>
+              <div>
+                <div class="delivery-text-main">Secure Payment</div>
+                <div class="delivery-text-sub">100% safe · UPI, Cards, Net Banking accepted</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Highlights -->
+          <div class="highlights">
+            <div class="highlights-title">Product Highlights</div>
+            <ul class="highlights-list">
+              ${highlights.map(h => `<li>${h}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description / Specs / Reviews Tabs -->
+      <div class="tabs-section">
+        <div class="tabs-nav">
+          <button class="tab-nav-btn active" onclick="switchTab('description', this)">Description</button>
+          <button class="tab-nav-btn" onclick="switchTab('specs', this)">Specifications</button>
+          <button class="tab-nav-btn" onclick="switchTab('reviews', this)">Reviews (${p.reviews.toLocaleString()})</button>
+        </div>
+
+        <div class="tab-panel active" id="tab-description">
+          <p>The <strong>${p.name}</strong> by <strong>${p.brand}</strong> is a top-quality product designed for everyday use. Whether you're looking for style, comfort, or performance — this product delivers on all fronts.</p>
+          <p>Crafted with premium materials and precision, it's built to last. The design combines modern aesthetics with functional features that you'll appreciate from day one.</p>
+          <p>${generateDescription(p)}</p>
+          <p>Ideal for gifting or personal use, this product comes in elegant packaging and is ready to impress. Backed by ${p.brand}'s trusted quality assurance and KnockYourDoor's hassle-free return policy.</p>
+        </div>
+
+        <div class="tab-panel" id="tab-specs">
+          <table class="spec-table">
+            ${generateSpecs(p).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}
+          </table>
+        </div>
+
+        <div class="tab-panel" id="tab-reviews">
+          <div class="reviews-summary">
+            <div>
+              <div class="reviews-big-num">${p.rating}</div>
+              <div class="reviews-big-stars">★★★★${p.rating >= 4.5 ? '★' : '☆'}</div>
+              <div class="reviews-big-count">${p.reviews.toLocaleString()} ratings</div>
+            </div>
+            <div class="reviews-bars">
+              ${generateRatingBars(p.rating)}
+            </div>
+          </div>
+          <div class="review-cards">
+            ${generateReviews(p).map(r => `
+              <div class="review-card">
+                <div class="review-card-header">
+                  <span class="review-author">${r.name}</span>
+                  <span class="review-date">${r.date}</span>
+                </div>
+                <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+                <div class="review-text">${r.text}</div>
+                <div class="review-verified">✓ Verified Purchase</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Products -->
+      <div class="related-section" id="related-section">
+        <div class="section-title">Related <span>Products</span></div>
+        <div class="related-grid" id="related-grid"></div>
+      </div>
+    `;
+
+    // Update sticky bar info
+    document.getElementById('sticky-name').textContent = p.name;
+    document.getElementById('sticky-price').textContent = '₹' + p.price.toLocaleString();
+
+    renderRelated();
+  }
+
+  function renderRelated() {
+    const p = product;
+    // Get products of same category, excluding current product, cycle through them
+    let sameCat = KYD_PRODUCTS.filter(x => x.cat === p.cat && x.id !== p.id);
+    if (sameCat.length === 0) sameCat = KYD_PRODUCTS.filter(x => x.id !== p.id);
+    // Shuffle consistently based on product id, then take up to 8
+    const shuffled = sameCat.slice().sort((a, b) => ((a.id * 7 + p.id * 3) % 13) - ((b.id * 5 + p.id * 7) % 13));
+    const related = shuffled.slice(0, 8);
+    document.getElementById('related-grid').innerHTML = related.map(r => productCardHTML(r)).join('');
+  }
+
+  function selectSize(size, btn) {
+    selectedSize = size;
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  function changeQty(delta) {
+    qty = Math.max(1, Math.min(10, qty + delta));
+    document.getElementById('qty-display').textContent = qty;
+  }
+
+  function ctaAddToCart() {
+    const p = product;
+    if (p.sizes && p.sizes.length > 0 && !selectedSize) {
+      showToast('Please select a size first! 👆', 'error');
+      // Scroll to size section
+      document.querySelector('.size-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    for (let i = 0; i < qty; i++) {
+      addToCart(p.id, p.name, p.price, p.img, selectedSize);
+    }
+    showToast(`${qty > 1 ? qty + 'x ' : ''}Added to cart! 🛒`, 'success');
+  }
+
+  function toggleWishlist() {
+    isWishlisted = !isWishlisted;
+    const btn = document.getElementById('wishlist-btn');
+    btn.textContent = isWishlisted ? '❤️' : '🤍';
+    btn.classList.toggle('wishlisted', isWishlisted);
+    showToast(isWishlisted ? 'Added to wishlist ❤️' : 'Removed from wishlist', isWishlisted ? 'success' : 'default');
+  }
+
+  function switchImg(src, thumbEl) {
+    document.getElementById('main-img').src = src;
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+    thumbEl.classList.add('active');
+  }
+
+  function switchTab(tabId, clickedBtn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('tab-' + tabId);
+    if (panel) panel.classList.add('active');
+    if (clickedBtn) clickedBtn.classList.add('active');
+    else {
+      // Called programmatically — find and activate the right button
+      const btns = document.querySelectorAll('.tab-nav-btn');
+      btns.forEach(b => {
+        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(tabId)) b.classList.add('active');
+      });
+      panel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function setupStickyBar() {
+    const cta = document.getElementById('sticky-cta');
+    window.addEventListener('scroll', () => {
+      const ctaBtn = document.querySelector('.cta-add-cart');
+      if (!ctaBtn) return;
+      const rect = ctaBtn.getBoundingClientRect();
+      cta.classList.toggle('visible', rect.bottom < 0);
+    });
+  }
+
+  // ── HELPER: category label ──
+  function catLabel(cat) {
+    const map = { men: "Men's Fashion", women: "Women's Fashion", shoes: 'Footwear', bags: 'Bags', caps: 'Caps & Headwear', accessories: 'Accessories', electronics: 'Electronics', groceries: 'Groceries', beauty: 'Beauty', sports: 'Sports', home: 'Home' };
+    return map[cat] || cat;
+  }
+
+  // ── HELPER: dynamic highlights ──
+  function generateHighlights(p) {
+    const base = [
+      `Brand: ${p.brand}`,
+      `Category: ${catLabel(p.cat)}`,
+      `Rating: ${p.rating}/5 (${p.reviews.toLocaleString()} verified reviews)`,
+    ];
+    if (p.sizes && p.sizes.length > 0) base.push(`Available sizes: ${p.sizes.join(', ')}`);
+    const extras = {
+      men:         ['Premium fabric quality', 'Machine washable', 'Wrinkle-resistant material'],
+      women:       ['Soft & breathable fabric', 'Elegant design for all occasions', 'Easy care instructions'],
+      shoes:       ['Cushioned insole for all-day comfort', 'Durable rubber outsole', 'True to size fit'],
+      bags:        ['Multiple compartments', 'Durable zipper closures', 'Water-resistant lining'],
+      caps:        ['Adjustable strap for perfect fit', 'UV protection', 'Sweat-wicking inner band'],
+      accessories: ['High-quality finish', 'Tarnish resistant', 'Gift-ready packaging'],
+      electronics: ['12-month warranty', 'Energy efficient design', 'Plug & play, no setup required'],
+      groceries:   ['100% natural ingredients', 'No preservatives', 'ISO certified'],
+      beauty:      ['Dermatologist tested', 'Paraben-free formula', 'Suitable for all skin types'],
+      sports:      ['Lightweight & durable', 'Non-slip grip', 'Suitable for beginners & pros'],
+      home:        ['BPA-free materials', 'Easy to clean', 'Modern minimalist design'],
+    };
+    return [...base, ...(extras[p.cat] || [])];
+  }
+
+  // ── HELPER: dynamic description ──
+  function generateDescription(p) {
+    const desc = {
+      men: `Designed for the modern man, this ${p.name.toLowerCase()} brings together style and comfort. Made with high-quality fabric that feels great against the skin and holds its shape wash after wash.`,
+      women: `Elevate your wardrobe with this stunning ${p.name.toLowerCase()}. The sophisticated design flatters all body types and transitions effortlessly from casual day wear to evening outings.`,
+      shoes: `Step out in confidence with these ${p.name.toLowerCase()}. Engineered for maximum comfort with every stride, featuring arch support and a cushioned footbed for all-day wear.`,
+      bags: `Carry everything you need in style with this ${p.name.toLowerCase()}. Thoughtfully designed with multiple pockets and durable hardware, it's your perfect everyday companion.`,
+      caps: `Complete your look with this ${p.name.toLowerCase()}. The adjustable fit ensures comfort for all head sizes, while the premium material keeps you looking fresh all day.`,
+      accessories: `Add the finishing touch to any outfit with this ${p.name.toLowerCase()}. Crafted with attention to detail, it's a versatile piece that complements any style.`,
+      electronics: `Experience the next level of technology with the ${p.name.toLowerCase()}. Designed for performance and reliability, it makes everyday tasks faster and more enjoyable.`,
+      groceries: `Premium quality ${p.name.toLowerCase()} sourced from the finest farms. No artificial additives — just pure, natural goodness for you and your family.`,
+      beauty: `Transform your skincare routine with this ${p.name.toLowerCase()}. Formulated with carefully selected ingredients that nourish, protect, and enhance your natural beauty.`,
+      sports: `Take your fitness to the next level with the ${p.name.toLowerCase()}. Engineered for performance, durability, and comfort so you can push your limits every day.`,
+      home: `Upgrade your living space with the ${p.name.toLowerCase()}. Thoughtfully designed to blend functionality with beautiful modern aesthetics.`,
+    };
+    return desc[p.cat] || `A premium quality product from ${p.brand}, designed to meet your everyday needs with style and reliability.`;
+  }
+
+  // ── HELPER: specs table ──
+  function generateSpecs(p) {
+    const base = [
+      ['Brand', p.brand],
+      ['Product Name', p.name],
+      ['Category', catLabel(p.cat)],
+      ['Price', '₹' + p.price.toLocaleString()],
+      ['Rating', p.rating + ' / 5'],
+      ['Total Reviews', p.reviews.toLocaleString()],
+    ];
+    if (p.sizes && p.sizes.length > 0) base.push(['Available Sizes', p.sizes.join(' · ')]);
+    const extra = {
+      men:         [['Material', 'Premium Cotton Blend'], ['Fit', 'Regular / Slim'], ['Care', 'Machine Wash Cold'], ['Country of Origin', 'India']],
+      women:       [['Material', 'Soft Cotton / Polyester Blend'], ['Fit', 'Regular'], ['Care', 'Hand Wash Recommended'], ['Country of Origin', 'India']],
+      shoes:       [['Sole Material', 'Rubber'], ['Upper Material', 'Mesh / Leather'], ['Closure', 'Lace-Up / Slip-On'], ['Water Resistant', 'Yes']],
+      bags:        [['Material', 'Premium Canvas / Leather'], ['Compartments', '3 Main + 2 Side Pockets'], ['Closure', 'YKK Zipper'], ['Dimensions', 'Medium']],
+      caps:        [['Material', 'Cotton Twill'], ['Fit', 'Adjustable Snapback / Strap'], ['Brim', '7cm Curved'], ['Washing', 'Hand Wash Only']],
+      accessories: [['Material', 'Alloy / Stainless Steel / Leather'], ['Finish', 'Gold / Silver Tone'], ['Occasion', 'Casual & Formal'], ['Gift Box', 'Included']],
+      electronics: [['Warranty', '12 Months'], ['Connectivity', 'Bluetooth 5.3 / USB-C'], ['Battery', 'Li-Ion Rechargeable'], ['In the Box', 'Product + Cable + Manual']],
+      groceries:   [['Weight / Volume', 'As per packaging'], ['Shelf Life', '12 months'], ['Storage', 'Cool & Dry Place'], ['Certification', 'FSSAI Approved']],
+      beauty:      [['Skin Type', 'All Skin Types'], ['Volume', '50ml'], ['Key Ingredient', 'Natural Extracts'], ['Expiry', '24 months from MFG']],
+      sports:      [['Weight', 'Lightweight'], ['Material', 'TPE / EVA / Nylon'], ['Dimensions', 'Standard'], ['Usage', 'Indoor & Outdoor']],
+      home:        [['Material', 'ABS / Stainless Steel / BPA-Free Plastic'], ['Dimensions', 'Standard'], ['Warranty', '6 months'], ['Assembly', 'Easy No-Tool Setup']],
+    };
+    return [...base, ...(extra[p.cat] || [])];
+  }
+
+  // ── HELPER: rating bars ──
+  function generateRatingBars(rating) {
+    // Generate plausible distribution
+    const r5 = Math.round((rating - 3) / 2 * 70 + 20);
+    const r4 = Math.round(r5 * 0.55);
+    const r3 = Math.round(r5 * 0.2);
+    const r2 = Math.round(r5 * 0.07);
+    const r1 = Math.round(r5 * 0.04);
+    const bars = [[5,'★★★★★',r5],[4,'★★★★☆',r4],[3,'★★★☆☆',r3],[2,'★★☆☆☆',r2],[1,'★☆☆☆☆',r1]];
+    return bars.map(([n, stars, pct]) => `
+      <div class="review-bar-row">
+        <span style="width:20px;text-align:right">${n}</span>
+        <span style="color:#F59E0B;font-size:11px">${stars}</span>
+        <div class="review-bar-track"><div class="review-bar-fill" style="width:${pct}%"></div></div>
+        <span style="width:30px">${pct}%</span>
+      </div>`).join('');
+  }
+
+  // ── HELPER: fake consistent reviews ──
+  function generateReviews(p) {
+    const names = ['Ravi K.','Priya S.','Anjali M.','Suresh T.','Neha R.','Amit V.','Sonal P.','Vikram D.'];
+    const dates = ['2 Jan 2026','15 Feb 2026','28 Mar 2026','10 Apr 2026','3 May 2026'];
+    const positives = [
+      `Amazing quality! The ${p.name.split(' ')[0]} exceeded my expectations. Delivery was fast and packaging was great.`,
+      `Really happy with this purchase. ${p.brand} never disappoints. I've ordered multiple times and always satisfied.`,
+      `Perfect fit and great material. Looks exactly like in the pictures. Will definitely buy again!`,
+      `Superb product! Great value for money. The quality is premium and feels very durable.`,
+      `My family loved it. The build quality is excellent and the price is unbeatable.`,
+    ];
+    const mid = [
+      `Good product overall. Minor packaging issue on arrival but the product itself is good.`,
+      `Decent quality for the price. Colour is slightly different from photos but still nice.`,
+    ];
+    const reviews = [
+      { name: names[p.id % 8],       stars: 5, date: dates[0], text: positives[p.id % 5] },
+      { name: names[(p.id+1) % 8],   stars: 5, date: dates[1], text: positives[(p.id+1) % 5] },
+      { name: names[(p.id+2) % 8],   stars: 4, date: dates[2], text: positives[(p.id+2) % 5] },
+      { name: names[(p.id+3) % 8],   stars: 4, date: dates[3], text: mid[p.id % 2] },
+      { name: names[(p.id+4) % 8],   stars: 5, date: dates[4], text: positives[(p.id+3) % 5] },
+    ];
+    return reviews;
+  }
+</script>
+</body>
+</html>

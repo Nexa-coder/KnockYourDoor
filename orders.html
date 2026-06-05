@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KnockYourDoor – My Orders</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<nav class="navbar">
+  <a href="home.html" class="nav-logo"><div class="logo-dot"></div>Knock<span>YourDoor</span></a>
+  <div class="nav-search">
+    <input type="text" placeholder="Search products..." id="search-input"/>
+    <button onclick="doSearch()">Search</button>
+  </div>
+  <div class="nav-actions">
+    <a href="home.html" class="nav-link">Home</a>
+    <a href="orders.html" class="nav-link active">Orders</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count" style="display:none">0</span></a>
+  </div>
+  <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-search">
+    <input type="text" id="mobile-search-input" placeholder="Search products..."/>
+    <button onclick="doMobileSearch()">Search</button>
+  </div>
+      <a href="home.html" class="mobile-nav-link "><span class="m-icon">🏠</span> Home</a>
+      <a href="orders.html" class="mobile-nav-link active"><span class="m-icon">📋</span> Orders</a>
+      <a href="profile.html" class="mobile-nav-link "><span class="m-icon">👤</span> Profile</a>
+      <a href="cart.html" class="mobile-nav-link mobile-cart-link"><span class="m-icon">🛒</span> Cart</a>
+</div>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const btn = document.getElementById('hamburger-btn');
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  function doMobileSearch() {
+    const q = document.getElementById('mobile-search-input').value.trim();
+    if (q) window.location.href = 'search.html?q=' + encodeURIComponent(q);
+  }
+  document.getElementById('mobile-search-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doMobileSearch();
+  });
+</script>
+
+<div class="orders-container">
+  <div class="section-title">My <span>Orders</span></div>
+  <div id="orders-list"></div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Knock<span>YourDoor</span></div>
+    <p>© 2026 <span>KnockYourDoor</span> — Built by Aman Kumar</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script>
+  if (!getUser()) window.location.href = 'index.html';
+
+  function renderOrders() {
+    const orders = getOrders();
+    const list = document.getElementById('orders-list');
+    if (!orders.length) {
+      list.innerHTML = `
+        <div class="empty-cart">
+          <div class="empty-icon">📋</div>
+          <h3>No orders yet</h3>
+          <p>Your placed orders will appear here.</p>
+          <a href="home.html" class="btn btn-primary">Start Shopping</a>
+        </div>`;
+      return;
+    }
+    list.innerHTML = orders.map(order => {
+      const statusClass = order.status === 'Delivered' ? 'status-delivered' : order.status === 'Cancelled' ? 'status-cancelled' : 'status-processing';
+      return `
+        <div class="order-card">
+          <div class="order-header">
+            <div>
+              <div class="order-id">Order #${order.id}</div>
+              <div class="order-date">Placed on ${order.date}</div>
+            </div>
+            <span class="order-status ${statusClass}">${order.status}</span>
+          </div>
+          <div class="order-items-preview">
+            ${order.items.map(i => `<span class="order-item-chip">${i.name}${i.size ? ' ('+i.size+')' : ''} × ${i.qty}</span>`).join('')}
+          </div>
+          <div class="order-footer">
+            <div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Total Amount</div>
+              <div class="order-total">₹${order.total.toLocaleString()}</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              ${order.status === 'Processing' ? `<button class="btn btn-sm" style="background:var(--bg);border:1.5px solid var(--border);color:var(--text2)" onclick="trackOrder('${order.id}')">Track Order</button>` : ''}
+              ${order.status === 'Delivered' ? `<button class="btn btn-sm btn-outline" onclick="reorder('${order.id}')">Reorder</button>` : ''}
+              ${order.status === 'Processing' ? `<button class="btn btn-sm" style="background:#FEE2E2;color:var(--danger);border:none" onclick="cancelOrder('${order.id}')">Cancel</button>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function trackOrder(id) { showToast(`Tracking order ${id}... 📍`); }
+  function reorder(id) { showToast('Items added to cart! 🛒', 'success'); }
+  function cancelOrder(id) {
+    const orders = getOrders();
+    const o = orders.find(x => x.id === id);
+    if (o) { o.status = 'Cancelled'; localStorage.setItem('kyd_orders', JSON.stringify(orders)); }
+    showToast('Order cancelled ❌', 'error');
+    renderOrders();
+  }
+
+  renderOrders();
+</script>
+</body>
+</html>

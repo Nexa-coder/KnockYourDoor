@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KnockYourDoor – Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<nav class="navbar">
+  <a href="home.html" class="nav-logo"><div class="logo-dot"></div>Knock<span>YourDoor</span></a>
+  <div class="nav-search">
+    <input type="text" placeholder="Search products..." id="search-input"/>
+    <button onclick="doSearch()">Search</button>
+  </div>
+  <div class="nav-actions">
+    <a href="home.html" class="nav-link">Home</a>
+    <a href="orders.html" class="nav-link">Orders</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="cart.html" class="cart-btn active">🛒 Cart <span class="cart-count" style="display:none">0</span></a>
+  </div>
+  <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-search">
+    <input type="text" id="mobile-search-input" placeholder="Search products..."/>
+    <button onclick="doMobileSearch()">Search</button>
+  </div>
+      <a href="home.html" class="mobile-nav-link "><span class="m-icon">🏠</span> Home</a>
+      <a href="orders.html" class="mobile-nav-link "><span class="m-icon">📋</span> Orders</a>
+      <a href="profile.html" class="mobile-nav-link "><span class="m-icon">👤</span> Profile</a>
+      <a href="cart.html" class="mobile-nav-link mobile-cart-link"><span class="m-icon">🛒</span> Cart</a>
+</div>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const btn = document.getElementById('hamburger-btn');
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  function doMobileSearch() {
+    const q = document.getElementById('mobile-search-input').value.trim();
+    if (q) window.location.href = 'search.html?q=' + encodeURIComponent(q);
+  }
+  document.getElementById('mobile-search-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doMobileSearch();
+  });
+</script>
+
+<div class="cart-container" id="cart-root"></div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Knock<span>YourDoor</span></div>
+    <p>© 2026 <span>KnockYourDoor</span> — Built by Aman Kumar</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script>
+  if (!getUser()) window.location.href = 'index.html';
+
+  function renderCart() {
+    const cart = getCart();
+    const root = document.getElementById('cart-root');
+    if (!cart.length) {
+      root.innerHTML = `
+        <div style="grid-column:1/-1">
+          <div class="empty-cart">
+            <div class="empty-icon">🛒</div>
+            <h3>Your cart is empty</h3>
+            <p>Add some items to get started!</p>
+            <a href="home.html" class="btn btn-primary">Continue Shopping</a>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const subtotal = getCartTotal();
+    const delivery = subtotal > 999 ? 0 : 49;
+    const total = subtotal + delivery;
+    const discount = Math.round(subtotal * 0.05);
+    const payable = total - discount;
+
+    root.innerHTML = `
+      <div>
+        <div class="section-title" style="margin-bottom:1.25rem">Your <span>Cart</span> (${cart.length} item${cart.length > 1 ? 's' : ''})</div>
+        <div class="cart-items-list">
+          ${cart.map(item => `
+            <div class="cart-item" id="item-${item.key}">
+              <div class="cart-item-emoji">
+                <img src="${item.img}" alt="${item.name}" style="width:64px;height:64px;object-fit:cover;border-radius:8px" onerror="this.style.display='none'"/>
+              </div>
+              <div class="cart-item-details">
+                <div class="cart-item-name">${item.name}${item.size ? ' <span style="background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">'+item.size+'</span>' : ''}</div>
+                <div class="cart-item-price">₹${(item.price * item.qty).toLocaleString()}</div>
+                <div class="qty-control">
+                  <button class="qty-btn" onclick="changeQty('${item.key}', -1)">−</button>
+                  <span class="qty-num">${item.qty}</span>
+                  <button class="qty-btn" onclick="changeQty('${item.key}', 1)">+</button>
+                  <span style="font-size:12px;color:var(--muted);margin-left:6px">@ ₹${item.price.toLocaleString()} each</span>
+                </div>
+              </div>
+              <button class="cart-remove" onclick="deleteItem('${item.key}')" title="Remove">✕</button>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div class="cart-summary">
+          <h3>Order Summary</h3>
+          <div class="summary-row"><span>Subtotal</span><span>₹${subtotal.toLocaleString()}</span></div>
+          <div class="summary-row"><span>Delivery</span><span style="color:var(--success)">${delivery === 0 ? 'FREE' : '₹' + delivery}</span></div>
+          <div class="summary-row"><span>Member Discount (5%)</span><span style="color:var(--danger)">−₹${discount.toLocaleString()}</span></div>
+          <div class="summary-row" style="border:none;padding-top:0.75rem">
+            <span style="font-weight:700;font-size:15px">Total Payable</span>
+            <span class="summary-total">₹${payable.toLocaleString()}</span>
+          </div>
+          ${delivery > 0 ? `<div style="background:var(--blue-light);color:var(--blue);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px">Add ₹${(999-subtotal).toLocaleString()} more for FREE delivery 🎁</div>` : '<div style="background:#D1FAE5;color:var(--success);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px">🎉 You got FREE delivery!</div>'}
+          <div class="promo-row">
+            <input type="text" placeholder="Promo code" id="promo-input"/>
+            <button onclick="applyPromo()">Apply</button>
+          </div>
+          <button class="checkout-btn" onclick="handleCheckout(${payable})">
+            Proceed to Checkout · ₹${payable.toLocaleString()} →
+          </button>
+          <a href="home.html" style="display:block;text-align:center;margin-top:0.75rem;font-size:13px;color:var(--muted)">← Continue Shopping</a>
+        </div>
+      </div>`;
+  }
+
+  function changeQty(key, delta) { updateQty(key, delta); renderCart(); }
+  function deleteItem(key) { removeFromCart(key); showToast('Item removed'); renderCart(); }
+  function applyPromo() {
+    const code = document.getElementById('promo-input').value.trim().toUpperCase();
+    if (code === 'KYD10') showToast('10% extra off applied! 🎉', 'success');
+    else showToast('Invalid promo code ❌', 'error');
+  }
+  function handleCheckout(total) {
+    const cart = getCart();
+    if (!cart.length) return;
+    const order = placeOrder(cart, total);
+    showToast(`Order ${order.id} placed! 🎉`, 'success');
+    setTimeout(() => window.location.href = 'orders.html', 1200);
+  }
+
+  renderCart();
+</script>
+</body>
+</html>

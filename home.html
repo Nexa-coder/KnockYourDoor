@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KnockYourDoor – Home</title>
+  <meta name="description" content="Shop electronics, groceries, fashion & more. Fast delivery."/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .hero { background: linear-gradient(150deg, #0057FF 0%, #003ACC 100%); color: white; padding: 4.5rem 2.5rem; position: relative; overflow: hidden; }
+    .hero-blob1 { position: absolute; top: -100px; right: -100px; width: 500px; height: 500px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+    .hero-blob2 { position: absolute; bottom: -80px; left: -80px; width: 300px; height: 300px; background: rgba(255,255,255,0.04); border-radius: 50%; }
+    .hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 3rem; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 6px 16px; border-radius: 50px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1.25rem; }
+    .hero-tag-dot { width: 6px; height: 6px; background: #7DFFB3; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+    .hero-title { font-family: var(--display); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.25rem; letter-spacing: -1px; }
+    .hero-title .highlight { color: transparent; background: linear-gradient(135deg, #93C5FD, #C4B5FD); -webkit-background-clip: text; background-clip: text; }
+    .hero-sub { font-size: 15px; opacity: 0.82; line-height: 1.75; margin-bottom: 2.25rem; max-width: 420px; }
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .hero-btn { padding: 0.85rem 2.2rem; border-radius: 50px; font-family: var(--body); font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s; }
+    .hero-btn-white { background: white; color: var(--blue); }
+    .hero-btn-white:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.2); }
+    .hero-btn-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.45); }
+    .hero-btn-outline:hover { background: rgba(255,255,255,0.12); }
+    .hero-stats { display: flex; gap: 2.5rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.18); }
+    .stat-num { font-family: var(--display); font-size: 1.6rem; font-weight: 800; }
+    .stat-label { font-size: 12px; opacity: 0.65; margin-top: 2px; font-weight: 500; }
+    .hero-visual { display: flex; align-items: center; justify-content: center; position: relative; }
+    .hero-visual-inner { width: 280px; height: 280px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7rem; border: 1px solid rgba(255,255,255,0.15); animation: float 4s ease-in-out infinite; }
+    .hero-visual-ring { position: absolute; width: 320px; height: 320px; border-radius: 50%; border: 1px dashed rgba(255,255,255,0.2); animation: spin 20s linear infinite; }
+    .hero-badge { position: absolute; background: white; color: var(--text); padding: 8px 16px; border-radius: 50px; font-size: 12px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 6px; }
+    .hero-badge-1 { top: 15%; left: -20px; }
+    .hero-badge-2 { bottom: 15%; right: -20px; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+    .trust-bar { background: white; border-bottom: 1px solid var(--border); }
+    .trust-inner { max-width: 1200px; margin: 0 auto; padding: 1rem 2.5rem; display: flex; align-items: center; justify-content: space-around; gap: 1rem; flex-wrap: wrap; }
+    .trust-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text2); white-space: nowrap; }
+
+    .categories { max-width: 1200px; margin: 3rem auto; padding: 0 2.5rem; }
+    .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; }
+    .cat-card { background: white; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1.2rem 0.75rem; text-align: center; cursor: pointer; transition: all 0.25s; }
+    .cat-card:hover { border-color: var(--blue); background: var(--blue-light); transform: translateY(-4px); box-shadow: var(--shadow); }
+    .cat-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .cat-name { font-size: 11px; font-weight: 700; color: var(--text); }
+
+    .deals-banner { max-width: 1200px; margin: 0 auto 3rem; padding: 0 2.5rem; }
+    .banner-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.25rem; }
+    .banner-card { border-radius: var(--radius); padding: 1.75rem 2rem; color: white; display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; position: relative; overflow: hidden; }
+    .banner-card-bg { position: absolute; right: 1rem; bottom: -1rem; font-size: 5rem; opacity: 0.2; }
+    .banner-1{background:linear-gradient(135deg,#0057FF,#003ACC)} .banner-2{background:linear-gradient(135deg,#00B37D,#007A54)} .banner-3{background:linear-gradient(135deg,#F59E0B,#D97706)}
+    .banner-label { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; }
+    .banner-title { font-family: var(--display); font-size: 1.35rem; font-weight: 800; margin: 6px 0 4px; }
+    .banner-sub { font-size: 12px; opacity: 0.8; }
+    .banner-btn { align-self: flex-start; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); color: white; padding: 6px 16px; border-radius: 50px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: 1rem; transition: all 0.2s; font-family: var(--body); }
+    .banner-btn:hover { background: rgba(255,255,255,0.35); }
+
+    .products-section { max-width: 1200px; margin: 0 auto 3rem; padding: 0 2.5rem; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1.5rem; }
+
+    .cat-filter-bar { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .cat-filter-btn { padding: 0.5rem 1.25rem; border-radius: 50px; border: 1.5px solid var(--border); background: white; font-family: var(--body); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: var(--text2); }
+    .cat-filter-btn.active, .cat-filter-btn:hover { border-color: var(--blue); background: var(--blue); color: white; }
+
+    .promo-strip { background: linear-gradient(135deg,#0057FF,#003ACC); color: white; padding: 1.5rem 2.5rem; margin-bottom: 3rem; }
+    .promo-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .promo-text { font-family: var(--display); font-size: 1.2rem; font-weight: 800; }
+    .promo-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+    .promo-input-row { display: flex; gap: 0.5rem; }
+    .promo-input-row input { padding: 0.65rem 1.25rem; border-radius: 50px; border: none; font-family: var(--body); font-size: 13px; width: 240px; outline: none; }
+    .promo-input-row button { padding: 0.65rem 1.5rem; border-radius: 50px; background: white; color: var(--blue); border: none; font-family: var(--body); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    @media(max-width:768px){ .hero-inner{grid-template-columns:1fr} .hero-visual{display:none} .banner-grid{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="home.html" class="nav-logo"><div class="logo-dot"></div>Knock<span>YourDoor</span></a>
+  <div class="nav-search">
+    <input type="text" placeholder="Search clothes, shoes, electronics..." id="search-input"/>
+    <button onclick="doSearch()">Search</button>
+  </div>
+  <div class="nav-actions">
+    <a href="home.html" class="nav-link active">Home</a>
+    <a href="orders.html" class="nav-link">Orders</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="product.html" class="nav-link">Product</a>
+    <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count" style="display:none">0</span></a>
+  </div>
+  <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-search">
+    <input type="text" id="mobile-search-input" placeholder="Search products..."/>
+    <button onclick="doMobileSearch()">Search</button>
+  </div>
+      <a href="home.html" class="mobile-nav-link active"><span class="m-icon">🏠</span> Home</a>
+      <a href="orders.html" class="mobile-nav-link "><span class="m-icon">📋</span> Orders</a>
+      <a href="profile.html" class="mobile-nav-link "><span class="m-icon">👤</span> Profile</a>
+      <a href="cart.html" class="mobile-nav-link mobile-cart-link"><span class="m-icon">🛒</span> Cart</a>
+</div>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const btn = document.getElementById('hamburger-btn');
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  function doMobileSearch() {
+    const q = document.getElementById('mobile-search-input').value.trim();
+    if (q) window.location.href = 'search.html?q=' + encodeURIComponent(q);
+  }
+  document.getElementById('mobile-search-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doMobileSearch();
+  });
+</script>
+
+<section class="hero">
+  <div class="hero-blob1"></div><div class="hero-blob2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag"><div class="hero-tag-dot"></div> 10-Minute Delivery</div>
+      <h1 class="hero-title">Everything Delivered<br/>to Your <span class="highlight">Door</span></h1>
+      <p class="hero-sub">Shop fashion, electronics, groceries & more. Fast delivery, best prices, zero hassle.</p>
+      <div class="hero-cta">
+        <button class="hero-btn hero-btn-white" onclick="document.getElementById('featured').scrollIntoView({behavior:'smooth'})">Shop Now →</button>
+        <button class="hero-btn hero-btn-outline" onclick="document.getElementById('deals').scrollIntoView({behavior:'smooth'})">Today's Deals</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-num">50K+</div><div class="stat-label">Products</div></div>
+        <div><div class="stat-num">2M+</div><div class="stat-label">Happy Users</div></div>
+        <div><div class="stat-num">10 min</div><div class="stat-label">Avg Delivery</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-visual-ring"></div>
+      <div class="hero-visual-inner">🛍️</div>
+      <div class="hero-badge hero-badge-1">⚡ Super Fast</div>
+      <div class="hero-badge hero-badge-2">✅ Verified Sellers</div>
+    </div>
+  </div>
+</section>
+
+<div class="trust-bar">
+  <div class="trust-inner">
+    <div class="trust-item"><span>🚀</span> Express Delivery</div>
+    <div class="trust-item"><span>🔒</span> Secure Payments</div>
+    <div class="trust-item"><span>↩️</span> Easy Returns</div>
+    <div class="trust-item"><span>🏷️</span> Best Prices</div>
+    <div class="trust-item"><span>📞</span> 24/7 Support</div>
+    <div class="trust-item"><span>📦</span> Free Delivery ₹999+</div>
+  </div>
+</div>
+
+<section class="categories">
+  <div class="section-title">Shop by <span>Category</span></div>
+  <div class="categories-grid">
+    <div class="cat-card" onclick="filterAndScroll('men')"><div class="cat-icon">👕</div><div class="cat-name">Men's Fashion</div></div>
+    <div class="cat-card" onclick="filterAndScroll('women')"><div class="cat-icon">👗</div><div class="cat-name">Women's Fashion</div></div>
+    <div class="cat-card" onclick="filterAndScroll('shoes')"><div class="cat-icon">👟</div><div class="cat-name">Footwear</div></div>
+    <div class="cat-card" onclick="filterAndScroll('bags')"><div class="cat-icon">👜</div><div class="cat-name">Bags</div></div>
+    <div class="cat-card" onclick="filterAndScroll('caps')"><div class="cat-icon">🧢</div><div class="cat-name">Caps</div></div>
+    <div class="cat-card" onclick="filterAndScroll('accessories')"><div class="cat-icon">💍</div><div class="cat-name">Accessories</div></div>
+    <div class="cat-card" onclick="filterAndScroll('electronics')"><div class="cat-icon">📱</div><div class="cat-name">Electronics</div></div>
+    <div class="cat-card" onclick="filterAndScroll('groceries')"><div class="cat-icon">🛒</div><div class="cat-name">Groceries</div></div>
+    <div class="cat-card" onclick="filterAndScroll('beauty')"><div class="cat-icon">💄</div><div class="cat-name">Beauty</div></div>
+    <div class="cat-card" onclick="filterAndScroll('sports')"><div class="cat-icon">⚽</div><div class="cat-name">Sports</div></div>
+    <div class="cat-card" onclick="filterAndScroll('home')"><div class="cat-icon">🏠</div><div class="cat-name">Home</div></div>
+  </div>
+</section>
+
+<section class="deals-banner" id="deals">
+  <div class="section-title">Hot <span>Deals</span></div>
+  <div class="banner-grid">
+    <div class="banner-card banner-1" onclick="filterAndScroll('men')">
+      <div class="banner-card-bg">👕</div>
+      <div><div class="banner-label">Fashion Sale</div><div class="banner-title">Clothes Up to 70% Off</div><div class="banner-sub">Men & Women — trending styles</div></div>
+      <button class="banner-btn">Shop Fashion →</button>
+    </div>
+    <div class="banner-card banner-2" onclick="filterAndScroll('shoes')">
+      <div class="banner-card-bg">👟</div>
+      <div><div class="banner-label">Footwear</div><div class="banner-title">Shoes From ₹499</div><div class="banner-sub">All sizes available</div></div>
+      <button class="banner-btn">Shop Shoes →</button>
+    </div>
+    <div class="banner-card banner-3" onclick="filterAndScroll('electronics')">
+      <div class="banner-card-bg">📱</div>
+      <div><div class="banner-label">Flash Sale</div><div class="banner-title">Electronics Deals</div><div class="banner-sub">Limited time offer</div></div>
+      <button class="banner-btn">Explore →</button>
+    </div>
+  </div>
+</section>
+
+<div class="promo-strip">
+  <div class="promo-inner">
+    <div>
+      <div class="promo-text">📬 Get exclusive deals in your inbox</div>
+      <div class="promo-sub">Join 2M+ shoppers getting daily deals</div>
+    </div>
+    <div class="promo-input-row">
+      <input type="email" placeholder="Enter your email address"/>
+      <button onclick="showToast('Subscribed! 🎉', 'success')">Subscribe</button>
+    </div>
+  </div>
+</div>
+
+<section class="products-section" id="featured">
+  <div class="section-title">All <span>Products</span></div>
+  <div class="cat-filter-bar" id="filter-bar"></div>
+  <div class="products-grid" id="products-grid"></div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Knock<span>YourDoor</span></div>
+    <p style="font-size:13px;opacity:0.6;margin-bottom:1rem">Everything delivered to your door, fast.</p>
+    <div class="footer-links">
+      <a href="#">About Us</a><a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a><a href="#">Contact</a><a href="#">Careers</a>
+    </div>
+    <p>© 2026 <span>KnockYourDoor</span> — Built by Aman Kumar · Made in India 🇮🇳</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script>
+  if (!getUser()) window.location.href = 'index.html';
+
+  const CATS = [
+    { key: 'all', label: 'All' },
+    { key: 'men', label: "Men's" },
+    { key: 'women', label: "Women's" },
+    { key: 'shoes', label: 'Shoes' },
+    { key: 'bags', label: 'Bags' },
+    { key: 'caps', label: 'Caps' },
+    { key: 'accessories', label: 'Accessories' },
+    { key: 'electronics', label: 'Electronics' },
+    { key: 'groceries', label: 'Groceries' },
+    { key: 'beauty', label: 'Beauty' },
+    { key: 'sports', label: 'Sports' },
+    { key: 'home', label: 'Home' },
+  ];
+  let currentCat = 'all';
+
+  const filterBar = document.getElementById('filter-bar');
+  filterBar.innerHTML = CATS.map(c =>
+    `<button class="cat-filter-btn ${c.key === 'all' ? 'active' : ''}" onclick="setCat('${c.key}')">${c.label}</button>`
+  ).join('');
+
+  function setCat(cat) {
+    currentCat = cat;
+    document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.toggle('active', b.textContent === CATS.find(c=>c.key===cat)?.label));
+    renderProducts();
+  }
+
+  function filterAndScroll(cat) {
+    setCat(cat);
+    document.getElementById('featured').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function renderProducts() {
+    const filtered = currentCat === 'all' ? KYD_PRODUCTS : KYD_PRODUCTS.filter(p => p.cat === currentCat);
+    document.getElementById('products-grid').innerHTML = filtered.map(p => productCardHTML(p)).join('');
+  }
+
+  renderProducts();
+</script>
+</body>
+</html>
